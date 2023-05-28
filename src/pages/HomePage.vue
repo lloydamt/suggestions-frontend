@@ -1,10 +1,10 @@
 <template>
   <div class="container">
     <div>
-      <MovieList />
+      <SuggestMovie />
     </div>
     <div>
-      <SuggestMovie />
+      <MovieList />
     </div>
   </div>
 </template>
