@@ -7,16 +7,14 @@
       :key="genre"
       :genre="genre"
     ></base-badge>
-    <div>
-      <button>View Details</button>
+    <div class="details">
+      <base-button kind="button">View Details</base-button>
     </div>
   </div>
 </template>
 
 <script>
-import BaseBadge from "../base/BaseBadge.vue";
 export default {
-  components: { BaseBadge },
   props: {
     id: Number,
     title: String,
@@ -29,10 +27,18 @@ export default {
 <style scoped>
 .movie {
   background-color: #fff;
-  border: 1px solid #cfdfe6;
+  border: 1px solid #3b9cc5;
   border-radius: 4px;
   padding: 5px;
   margin: 20px auto;
+  position: relative;
+  height: 200px;
+}
+
+.details {
+  position: absolute;
+  right: 0;
+  margin: 5px;
 }
 
 .movie h3,
