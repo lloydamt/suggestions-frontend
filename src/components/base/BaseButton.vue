@@ -2,7 +2,7 @@
   <button v-if="kind === 'button'">
     <slot></slot>
   </button>
-  <router-link v-else>
+  <router-link v-else :to="path">
     <slot></slot>
   </router-link>
 </template>
@@ -13,6 +13,10 @@ export default {
     kind: {
       type: String,
       default: "link",
+      required: false,
+    },
+    path: {
+      type: String,
       required: false,
     },
   },

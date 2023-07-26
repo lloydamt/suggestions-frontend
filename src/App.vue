@@ -1,17 +1,10 @@
 <template>
-  <TheHeader />
-  <HomePage />
+  <router-view> </router-view>
 </template>
 
 <script>
-import TheHeader from "./components/layout/TheHeader.vue";
-import HomePage from "./pages/HomePage.vue";
 export default {
   name: "App",
-  components: {
-    TheHeader,
-    HomePage,
-  },
 };
 </script>
 

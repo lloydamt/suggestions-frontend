@@ -8,7 +8,7 @@
       :genre="genre"
     ></base-badge>
     <div class="details">
-      <base-button kind="button">View Details</base-button>
+      <base-button :path="link">View Details</base-button>
     </div>
   </div>
 </template>
@@ -20,6 +20,11 @@ export default {
     title: String,
     genres: Array,
     year: Number,
+  },
+  computed: {
+    link() {
+      return `/movies/${this.id}`;
+    },
   },
 };
 </script>
