@@ -18,6 +18,7 @@ export default {
     path: {
       type: String,
       required: false,
+      default: "",
     },
   },
 };
@@ -36,5 +37,6 @@ a {
   margin-right: 0.5rem;
   padding: 0.75rem 1.5rem;
   text-align: right;
+  display: inline-block;
 }
 </style>
