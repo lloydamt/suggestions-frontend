@@ -15,16 +15,11 @@
               <base-badge :genre="genre"></base-badge>
             </span>
           </div>
-          <form class="comment-form">
-            <div class="container">
-              <textarea id="comment" cols="50" rows="2"></textarea>
-              <base-button kind="button">Leave a comment</base-button>
-            </div>
-          </form>
+          <CommentForm @add-comment="addComment" />
         </base-card>
       </div>
       <div class="card">
-        <CommentList :comments="comments" />
+        <CommentList :comments="comments" @delete-comment="deleteComment" />
       </div>
     </div>
   </div>
@@ -32,16 +27,28 @@
 
 <script>
 import CommentList from "@/components/comments/CommentList.vue";
+import CommentForm from "@/components/comments/CommentForm.vue";
 export default {
   components: {
     CommentList,
+    CommentForm,
   },
   props: ["id"],
+  computed: {
+    commentList() {
+      return this.$store.getters.comments;
+    },
+  },
   data() {
     return {
       movie: null,
       comments: null,
     };
+  },
+  watch: {
+    commentList() {
+      this.getComments();
+    },
   },
   created() {
     this.movie = this.$store.getters.movies.find(
@@ -49,9 +56,25 @@ export default {
     );
   },
   mounted() {
-    this.comments = this.$store.getters.comments.filter(
-      (comment) => comment.movie.id === this.movie.id
-    );
+    this.getComments();
+  },
+  methods: {
+    addComment(content) {
+      const payload = {
+        movieId: this.id,
+        content,
+      };
+      this.$store.dispatch("addComment", payload);
+      this.getComments();
+    },
+    deleteComment(id) {
+      this.comments = this.comments.filter((comment) => id !== comment.id);
+    },
+    getComments() {
+      this.comments = this.commentList.filter(
+        (comment) => comment.movie.id === this.movie.id
+      );
+    },
   },
 };
 </script>
@@ -69,10 +92,5 @@ export default {
 
 .card {
   margin: 2em;
-}
-
-.comment-form {
-  margin: 2em 0;
-  padding: 5px 0;
 }
 </style>
