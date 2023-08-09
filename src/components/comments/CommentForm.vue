@@ -19,6 +19,7 @@ export default {
     addComment() {
       if (this.content.length > 0) {
         this.$emit("add-comment", this.content);
+        this.content = ''
       }
     },
   },
