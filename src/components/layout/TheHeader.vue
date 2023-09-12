@@ -1,7 +1,7 @@
 <template>
   <header>
     <nav>
-      <h1>ScreenStash</h1>
+      <router-link to="/" class="title"><h1>ScreenStash</h1></router-link>
       <ul>
         <li>Save a movie</li>
         <li>Search Movies</li>
@@ -39,6 +39,11 @@ header nav {
 
 h1 {
   margin: 0;
+  color: white;
+}
+
+a {
+  text-decoration: none;
 }
 
 h1 a {
