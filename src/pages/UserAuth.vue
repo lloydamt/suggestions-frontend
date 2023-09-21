@@ -1,13 +1,27 @@
 <template>
   <div class="page-control">
+    <base-dialog :show="!!authError" title="Error" @close="closeDialog">
+      <p>{{ authError }}</p>
+    </base-dialog>
     <form @submit.prevent="submitForm">
       <div class="form-control">
+        <label for="username">Email Address</label>
+        <input
+          type="email"
+          id="email"
+          v-model.trim="email"
+          minlength="1"
+          @blur="clearErrors('length')"
+        />
+      </div>
+      <div v-if="mode === 'signup'" class="form-control">
         <label for="username">Username</label>
         <input
           type="text"
           id="username"
           v-model.trim="username"
           minlength="4"
+          @blur="clearErrors('length')"
         />
       </div>
       <div class="form-control">
@@ -17,17 +31,25 @@
           id="password"
           v-model.trim="password"
           minlength="6"
+          @blur="clearErrors('length')"
         />
       </div>
+      <p v-if="!isValid && error.length" class="error">
+        Enter a valid username or password
+      </p>
       <div class="form-control" v-if="mode === 'signup'">
         <label for="confirm-password">Confirm Password</label>
         <input
           type="password"
           id="confirm-password"
-          v-model.trim="conform_password"
+          v-model.trim="confirm_password"
           minlength="6"
+          @blur="clearErrors('match')"
         />
       </div>
+      <p v-if="!isValid && error.match" class="error">
+        Both passwords must match
+      </p>
       <base-button kind="button">{{ switchButtonText }}</base-button>
     </form>
     <div class="switch">
@@ -42,10 +64,18 @@
 export default {
   data() {
     return {
+      email: "",
       username: "",
       password: "",
       confirm_password: "",
       mode: "login",
+      loading: false,
+      isValid: true,
+      error: {
+        length: false,
+        match: false,
+      },
+      authError: null,
     };
   },
   computed: {
@@ -66,16 +96,54 @@ export default {
         this.mode = "login";
       }
     },
-    submitForm() {
+    clearErrors(select) {
       this.isValid = true;
-      if (this.username.length < 5 || this.password.length < 5 || this.mode === 'signup' && this.password !== this.confirm_password) {
+      this.error[select] = false;
+    },
+    clearFields() {
+      this.email = ""
+      this.username = "",
+      this.password = "",
+      this.confirm_password = ""
+    },
+    closeDialog() {
+      this.authError = false;
+    },
+    async submitForm() {
+      this.isValid = true;
+      if (this.username.length < 3 || this.password.length < 6) {
         this.isValid = false;
+        this.error.length = true;
         return;
       }
-      if (this.mode === 'signup' && this.password !== this.confirm_password) {
+      if (this.mode === "signup" && this.password !== this.confirm_password) {
         this.isValid = false;
+        this.error.match = true;
         return;
       }
+      this.loading = true;
+      
+      if (this.mode === "signup") {
+        try {
+          await this.$store.dispatch("signup", {
+            email: this.email,
+            username: this.username,
+            password: this.password,
+          });
+        } catch (error) {
+          this.authError = "Failed to register - " + error.message; 
+        }
+      }
+
+      // if (this.mode === "login") {
+      //   try {
+          
+      //   } catch (error) {
+          
+      //   }
+      // }
+      this.loading = false;
+      this.clearFields();
     },
   },
 };
@@ -88,6 +156,10 @@ export default {
   margin: 5% auto;
   width: 450px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.error {
+  color: #cc0000;
 }
 
 form {

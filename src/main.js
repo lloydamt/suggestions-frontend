@@ -5,12 +5,14 @@ import router from "./router.js";
 import BaseCard from "./components/base/BaseCard.vue";
 import BaseBadge from "./components/base/BaseBadge.vue";
 import BaseButton from "./components/base/BaseButton.vue";
+import BaseDialog from "./components/base/BaseDialog.vue";
 
 const app = createApp(App);
 
 app.component("base-card", BaseCard);
 app.component("base-badge", BaseBadge);
 app.component("base-button", BaseButton);
+app.component("base-dialog", BaseDialog);
 
 app.use(store);
 app.use(router);
