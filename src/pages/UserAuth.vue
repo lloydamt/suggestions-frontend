@@ -4,52 +4,8 @@
       <p>{{ authError }}</p>
     </base-dialog>
     <form @submit.prevent="submitForm">
-      <div class="form-control">
-        <label for="username">Email Address</label>
-        <input
-          type="email"
-          id="email"
-          v-model.trim="email"
-          minlength="1"
-          @blur="clearErrors('length')"
-        />
-      </div>
-      <div v-if="mode === 'signup'" class="form-control">
-        <label for="username">Username</label>
-        <input
-          type="text"
-          id="username"
-          v-model.trim="username"
-          minlength="4"
-          @blur="clearErrors('length')"
-        />
-      </div>
-      <div class="form-control">
-        <label for="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          v-model.trim="password"
-          minlength="6"
-          @blur="clearErrors('length')"
-        />
-      </div>
-      <p v-if="!isValid && error.length" class="error">
-        Enter a valid username or password
-      </p>
-      <div class="form-control" v-if="mode === 'signup'">
-        <label for="confirm-password">Confirm Password</label>
-        <input
-          type="password"
-          id="confirm-password"
-          v-model.trim="confirm_password"
-          minlength="6"
-          @blur="clearErrors('match')"
-        />
-      </div>
-      <p v-if="!isValid && error.match" class="error">
-        Both passwords must match
-      </p>
+      <UserSignup v-if="mode === 'signup'" />
+      <UserLogin v-else />
       <base-button kind="button">{{ switchButtonText }}</base-button>
     </form>
     <div class="switch">
@@ -61,7 +17,13 @@
 </template>
 
 <script>
+import UserSignup from "@/components/auth/UserSignup.vue";
+import UserLogin from "@/components/auth/UserLogin.vue";
 export default {
+  components: {
+    UserLogin,
+    UserSignup,
+  },
   data() {
     return {
       email: "",
@@ -101,10 +63,10 @@ export default {
       this.error[select] = false;
     },
     clearFields() {
-      this.email = ""
-      this.username = "",
-      this.password = "",
-      this.confirm_password = ""
+      this.email = "";
+      this.username = "";
+      this.password = "";
+      this.confirm_password = "";
     },
     closeDialog() {
       this.authError = false;
@@ -122,7 +84,7 @@ export default {
         return;
       }
       this.loading = true;
-      
+
       if (this.mode === "signup") {
         try {
           await this.$store.dispatch("signup", {
@@ -131,15 +93,15 @@ export default {
             password: this.password,
           });
         } catch (error) {
-          this.authError = "Failed to register - " + error.message; 
+          this.authError = "Failed to register - " + error.message;
         }
       }
 
       // if (this.mode === "login") {
       //   try {
-          
+
       //   } catch (error) {
-          
+
       //   }
       // }
       this.loading = false;
@@ -167,11 +129,11 @@ form {
   padding: 1rem;
 }
 
-.form-control {
+:deep(.form-control) {
   margin: 0.5rem 0;
 }
 
-label {
+:deep(label) {
   font-weight: bold;
   margin-bottom: 0.5rem;
   display: block;
@@ -188,8 +150,7 @@ label {
   color: #0077be;
 }
 
-input,
-textarea {
+:deep(input, textarea) {
   display: block;
   width: 100%;
   font: inherit;
@@ -197,8 +158,7 @@ textarea {
   padding: 0.15rem;
 }
 
-input:focus,
-textarea:focus {
+:deep(input:focus, textarea:focus) {
   border-color: #3d008d;
   background-color: #faf6ff;
   outline: none;

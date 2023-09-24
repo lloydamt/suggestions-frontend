@@ -1,11 +1,30 @@
 import axios from "axios";
 
 export default {
-  login(context, payload) {
-    return context.dispatch("auth", {
-      ...payload,
-      mode: "login",
-    });
+  async login(context, payload) {
+    console.log("reached")
+    const url = "http://localhost:8085/auth";
+
+    try {
+      const response = await axios.post(url, payload, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      
+      const token = response.headers["authorization"].replace("Bearer", "")
+      const userId = response.data
+
+      localStorage.setItem("token", token)
+      localStorage.setItem("userId", userId)
+
+      context.commit('setUser', {
+        userId,
+        token
+      })
+    } catch (error) {
+      console.log(error)
+    }
   },
   async signup(context, payload) {
     const url = "http://localhost:8085/user/register";
@@ -20,14 +39,16 @@ export default {
           },
         }
       );
-      console.log(response)
-      const data = response.data;
 
       if (response.status !== 201) {
         throw new Error(response.statusText);
       }
 
-      console.log(data);
+      await context.dispatch('login', {
+        email: payload.email,
+        password: payload.password
+      })
+
     } catch (error) {
       throw new Error(error.response.data.message);
     }
