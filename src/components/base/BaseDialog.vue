@@ -1,5 +1,5 @@
 <template>
-  <div class="backdrop" v-if="show"></div>
+  <div class="backdrop" v-if="show" @click="closeDialog"></div>
   <dialog open v-if="show">
     <header>
       <slot name="header">
@@ -9,7 +9,7 @@
     <slot></slot>
     <menu v-if="!fixed">
       <slot name="actions">
-        <base-button @click="$emit('close')">Close</base-button>
+        <base-button @click="closeDialog">Close</base-button>
       </slot>
     </menu>
   </dialog>
@@ -30,6 +30,11 @@ export default {
     fixed: {
       type: Boolean,
       required: false,
+    },
+  },
+  methods: {
+    closeDialog() {
+      this.$emit("close");
     },
   },
 };

@@ -1,28 +1,29 @@
 <template>
   <section>
     <div class="form-control">
-      <label for="email">Email Address</label>
+      <label for="login_email">Email Address</label>
       <input
         type="email"
-        id="email"
-        v-model.trim="email"
+        id="login_email"
+        v-model.trim="inputs.email"
         minlength="1"
-        @blur="clearErrors"
+        @input="emitInputs"
+        @blur="clearError('email')"
       />
+      <p v-if="errors.email" class="error">Enter a valid email address</p>
     </div>
     <div class="form-control">
       <label for="password">Password</label>
       <input
         type="password"
-        id="password"
-        v-model.trim="password"
+        id="login_password"
+        v-model.trim="inputs.password"
         minlength="6"
-        @blur="clearErrors"
+        @input="emitInputs"
+        @blur="clearError('password')"
       />
+      <p v-if="errors.password" class="error">Enter a password</p>
     </div>
-    <!-- <p v-if="!isValid && error.length" class="error">
-    Enter a valid username or password
-  </p> -->
   </section>
 </template>
 
@@ -30,14 +31,18 @@
 export default {
   data() {
     return {
-      email: "",
-      username: "",
-      password: "",
+      inputs: { email: "", password: "" },
     };
   },
+  props: {
+    errors: Object,
+  },
   methods: {
-    clearErrors() {
-      return;
+    emitInputs() {
+      this.$emit("set-inputs", this.inputs);
+    },
+    clearError(input) {
+      this.$emit("clear-error", input);
     },
   },
 };

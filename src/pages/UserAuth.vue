@@ -3,9 +3,26 @@
     <base-dialog :show="!!authError" title="Error" @close="closeDialog">
       <p>{{ authError }}</p>
     </base-dialog>
+    <base-dialog
+      :show="!!emptyFormError"
+      title="Enter some data"
+      @close="closeDialog"
+    >
+      <p>{{ emptyFormError }}</p>
+    </base-dialog>
     <form @submit.prevent="submitForm">
-      <UserSignup v-if="mode === 'signup'" />
-      <UserLogin v-else />
+      <UserSignup
+        v-if="mode === 'signup'"
+        :errors="errors"
+        @set-inputs="setInputs"
+        @clear-error="clearError"
+      />
+      <UserLogin
+        v-else
+        :errors="errors"
+        @set-inputs="setInputs"
+        @clear-error="clearError"
+      />
       <base-button kind="button">{{ switchButtonText }}</base-button>
     </form>
     <div class="switch">
@@ -24,20 +41,30 @@ export default {
     UserLogin,
     UserSignup,
   },
+  created() {
+    this.initialFormData = { ...this.inputs };
+  },
   data() {
     return {
-      email: "",
-      username: "",
-      password: "",
-      confirm_password: "",
+      inputs: {
+        email: "",
+        username: "",
+        password: "",
+        confirmPassword: "",
+      },
+      initialFormData: {},
       mode: "login",
       loading: false,
-      isValid: true,
-      error: {
-        length: false,
-        match: false,
+      formIsValid: true,
+      errors: {
+        email: false,
+        username: false,
+        password: false,
+        confirmPassword: false,
       },
       authError: null,
+      emptyFormError: null,
+      isDirty: false,
     };
   },
   computed: {
@@ -49,6 +76,11 @@ export default {
     switchButtonText() {
       return this.mode === "login" ? "Login" : "Register";
     },
+    isFormChanged() {
+      return (
+        JSON.stringify(this.inputs) !== JSON.stringify(this.initialFormData)
+      );
+    },
   },
   methods: {
     switchMode() {
@@ -57,55 +89,134 @@ export default {
       } else {
         this.mode = "login";
       }
+      this.clearErrors();
     },
-    clearErrors(select) {
-      this.isValid = true;
-      this.error[select] = false;
+    setInputs(inputs) {
+      this.inputs = inputs;
+      this.isDirty = this.isFormChanged;
+    },
+    clearError(input) {
+      this.errors[input] = false;
+    },
+    clearErrors() {
+      for (let input in this.errors) {
+        this.errors[input] = false;
+      }
     },
     clearFields() {
-      this.email = "";
-      this.username = "";
-      this.password = "";
-      this.confirm_password = "";
+      for (let input in this.inputs) {
+        this.inputs[input] = "";
+      }
     },
     closeDialog() {
-      this.authError = false;
+      this.authError = null;
+      this.emptyFormError = null;
     },
     async submitForm() {
-      this.isValid = true;
-      if (this.username.length < 3 || this.password.length < 6) {
-        this.isValid = false;
-        this.error.length = true;
-        return;
+      if (!this.isDirty) {
+        this.emptyFormError = "Please enter some data into the form";
+      } else {
+        this.isValid = true;
+        this.validateFormData();
       }
-      if (this.mode === "signup" && this.password !== this.confirm_password) {
-        this.isValid = false;
-        this.error.match = true;
-        return;
-      }
-      this.loading = true;
 
-      if (this.mode === "signup") {
-        try {
-          await this.$store.dispatch("signup", {
-            email: this.email,
-            username: this.username,
-            password: this.password,
-          });
-        } catch (error) {
-          this.authError = "Failed to register - " + error.message;
+      if (this.formIsValid && this.authError === null) {
+        this.loading = true;
+        if (this.mode === "signup") {
+          await this.attemptSignup();
         }
+
+        if (this.mode === "login") {
+          await this.attemptLogin();
+        }
+        this.loading = false;
       }
-
-      // if (this.mode === "login") {
-      //   try {
-
-      //   } catch (error) {
-
-      //   }
-      // }
-      this.loading = false;
-      this.clearFields();
+    },
+    async attemptSignup() {
+      try {
+        await this.$store.dispatch("signup", {
+          email: this.inputs.email,
+          username: this.inputs.username,
+          password: this.input.password,
+        });
+        this.clearFields();
+      } catch (error) {
+        this.authError = "Failed to register - " + error.message;
+      }
+    },
+    async attemptLogin() {
+      try {
+        await this.$store.dispatch("login", {
+          email: this.email,
+          password: this.password,
+        });
+        this.clearFields();
+      } catch (error) {
+        this.authError = "Failed to login - " + error.message;
+      }
+    },
+    validateEmail() {
+      const input = "email";
+      if (this.inputs.email.length < 1 && !this.inputs.email.includes("@")) {
+        this.setInvalidForm(input);
+      } else {
+        this.setValidForm(input);
+      }
+    },
+    validateUsername() {
+      const input = "username";
+      if (this.inputs.username.length < 4) {
+        this.setInvalidForm(input);
+      } else {
+        this.setValidForm(input);
+      }
+    },
+    validatePassword() {
+      if (this.mode === "signup") {
+        this.attemptPasswordValidation(6);
+      } else {
+        this.attemptPasswordValidation(1);
+      }
+    },
+    attemptPasswordValidation(length) {
+      if (this.inputs.password.length < length) {
+        this.setInvalidForm("password");
+      } else {
+        this.setValidForm("password");
+      }
+    },
+    validateConfirmPassword() {
+      const input = "confirmPassword";
+      if (
+        this.inputs.confirmPassword !== this.inputs.password &&
+        !this.errors.password
+      ) {
+        this.setInvalidForm(input);
+      } else {
+        this.setValidForm(input);
+      }
+    },
+    validateFormData() {
+      this.validateEmail();
+      this.validatePassword();
+      if (this.mode === "signup") {
+        this.validateUsername();
+        this.validateConfirmPassword();
+      }
+    },
+    setValidForm(input) {
+      this.errors[input] = false;
+      if (
+        !this.errors.email &&
+        !this.errors.username &&
+        !this.errors.password &&
+        !this.errors.confirmPassword
+      )
+        this.formIsValid = true;
+    },
+    setInvalidForm(input) {
+      this.errors[input] = true;
+      this.formIsValid = false;
     },
   },
 };
@@ -120,8 +231,9 @@ export default {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-.error {
+:deep(.error) {
   color: #cc0000;
+  font-size: 13px;
 }
 
 form {

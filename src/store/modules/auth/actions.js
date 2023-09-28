@@ -2,28 +2,27 @@ import axios from "axios";
 
 export default {
   async login(context, payload) {
-    console.log("reached")
     const url = "http://localhost:8085/auth";
 
     try {
       const response = await axios.post(url, payload, {
         headers: {
-          "Content-Type": "application/json"
-        }
-      })
-      
-      const token = response.headers["authorization"].replace("Bearer", "")
-      const userId = response.data
+          "Content-Type": "application/json",
+        },
+      });
 
-      localStorage.setItem("token", token)
-      localStorage.setItem("userId", userId)
+      const token = response.headers["authorization"].replace("Bearer", "");
+      const userId = response.data;
 
-      context.commit('setUser', {
+      localStorage.setItem("token", token);
+      localStorage.setItem("userId", userId);
+
+      context.commit("setUser", {
         userId,
-        token
-      })
+        token,
+      });
     } catch (error) {
-      console.log(error)
+      throw new Error(error.response.data);
     }
   },
   async signup(context, payload) {
@@ -44,11 +43,10 @@ export default {
         throw new Error(response.statusText);
       }
 
-      await context.dispatch('login', {
+      await context.dispatch("login", {
         email: payload.email,
-        password: payload.password
-      })
-
+        password: payload.password,
+      });
     } catch (error) {
       throw new Error(error.response.data.message);
     }
