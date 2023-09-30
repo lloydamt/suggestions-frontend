@@ -90,6 +90,7 @@ export default {
         this.mode = "login";
       }
       this.clearErrors();
+      this.clearFields();
     },
     setInputs(inputs) {
       this.inputs = inputs;
@@ -137,22 +138,24 @@ export default {
         await this.$store.dispatch("signup", {
           email: this.inputs.email,
           username: this.inputs.username,
-          password: this.input.password,
+          password: this.inputs.password,
         });
         this.clearFields();
+        this.$router.replace("/");
       } catch (error) {
-        this.authError = "Failed to register - " + error.message;
+        this.authError = "Failed to register - try again";
       }
     },
     async attemptLogin() {
       try {
         await this.$store.dispatch("login", {
-          email: this.email,
-          password: this.password,
+          email: this.inputs.email,
+          password: this.inputs.password,
         });
         this.clearFields();
+        this.$router.push("/");
       } catch (error) {
-        this.authError = "Failed to login - " + error.message;
+        this.authError = "Failed to login - try again";
       }
     },
     validateEmail() {
