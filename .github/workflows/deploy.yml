@@ -18,6 +18,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
+      - name: Set up vue cli
+        run: npm install
       - name: Build dist folder
         run: npm run build
       - name: Configure AWS credentials
