@@ -4,7 +4,7 @@ let timer;
 
 export default {
   async login(context, payload) {
-    const url = "http://localhost:8085/auth";
+    const url = "http://suggestions.us-east-1.elasticbeanstalk.com/auth";
 
     try {
       const response = await axios.post(url, payload, {
@@ -36,7 +36,8 @@ export default {
     }
   },
   async signup(context, payload) {
-    const url = "http://localhost:8085/user/register";
+    const url =
+      "http://suggestions.us-east-1.elasticbeanstalk.com/user/register";
 
     try {
       const response = await axios.post(
