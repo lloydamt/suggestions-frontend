@@ -5,6 +5,14 @@ terraform {
       version = "4.2.0"
     }
   }
+
+  cloud {
+    organization = "lloydamt_solutions-org"
+
+    workspaces {
+      name = "screen-stash"
+    }
+  }
 }
 
 provider "aws" {
@@ -61,16 +69,7 @@ resource "aws_s3_bucket_acl" "fe-bucket-public-acl" {
   acl    = "public-read"
 }
 
-# resource "aws_s3_object" "dist" {
-#   for_each = fileset("../dist", "**")
-#   bucket   = aws_s3_bucket.frontend-bucket.bucket
-#   key      = each.value
-#   source   = "../dist/${each.value}"
-#   etag     = filemd5("../dist/${each.value}")
-#   depends_on = [ aws_s3_bucket_public_access_block.fe-bucket-public_access_block, aws_s3_bucket_acl.fe-bucket-public-acl ]
-# }
-
-# # Upload index.html
+# Upload index.html
 resource "aws_s3_object" "index" {
   bucket = aws_s3_bucket.frontend-bucket.bucket
   key    = "index.html"
