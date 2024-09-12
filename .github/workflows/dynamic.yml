@@ -21,8 +21,7 @@ jobs:
           cd terraform
           terraform init
           terraform validate
-          terraform force-unlock
-          terraform plan
+          terraform plan -lock=false
           | -var="bucket_name=${{ github.run_id }}" 
           | -var="access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" 
           | -var="secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
