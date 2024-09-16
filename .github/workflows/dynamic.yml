@@ -26,6 +26,6 @@ jobs:
         run: |
           cd terraform
           terraform init
-          terraform destroy -lock=false --auto-approve
+          terraform destroy -lock=false -var="bucket_name=${{ github.run_id }}" -var="access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" -var="secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" --auto-approve
           terraform validate
           terraform apply -lock=false -var="bucket_name=${{ github.run_id }}" -var="access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" -var="secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" --auto-approve
