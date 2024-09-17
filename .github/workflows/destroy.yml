@@ -18,4 +18,6 @@ jobs:
       - name: Change to TF directory
         run: cd terraform
       - name: Terraform destroy
-        run: terraform destroy -lock=false --auto-approve
+        run: |
+          terraform init
+          terraform destroy -lock=false -var="bucket_name=${{ github.run_id }}" -var="access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" -var="secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" --auto-approve
