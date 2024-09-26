@@ -27,7 +27,9 @@ jobs:
       #     terraform validate
       #     terraform apply -lock=false -var="bucket_name=${{ github.run_id }}" -var="access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" -var="secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" --auto-approve
       - name: Set branch name as env variable
-        run: echo "BRANCH_NAME=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+        run: |
+          echo "BRANCH_NAME=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+          echo ${GITHUB_REF_NAME}
       - run: echo "${{ env.BRANCH_NAME }}"
       - name: Fire event
         run: |
