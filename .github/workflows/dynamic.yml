@@ -10,8 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       # - name: Set up node/npm
       #   uses: actions/setup-node@v4
       #   with:
@@ -29,7 +27,7 @@ jobs:
       #     terraform validate
       #     terraform apply -lock=false -var="bucket_name=${{ github.run_id }}" -var="access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" -var="secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" --auto-approve
       - name: Set branch name as env variable
-        run: echo "BRANCH_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
+        run: echo "BRANCH_NAME=${GITHUB_REF_NAME}" >> $GITHUB_ENV
       - run: echo "${{ env.BRANCH_NAME }}"
       - name: Fire event
         run: |
