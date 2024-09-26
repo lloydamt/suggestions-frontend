@@ -31,8 +31,8 @@ jobs:
       - name: Set branch name as env variable
         run: |
           git branch
-          echo "branch_name=${{ github.ref }}" >> $GITHUB_ENV
-      - run: echo "${{ github.ref }}"
+          echo "branch_name=${{ github.head_ref }}" >> $GITHUB_ENV
+      - run: echo "${{ github.head_ref }}"
       - name: Fire event
         run: |
           curl -L \
