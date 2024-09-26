@@ -28,9 +28,8 @@ jobs:
       #     terraform apply -lock=false -var="bucket_name=${{ github.run_id }}" -var="access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" -var="secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" --auto-approve
       - name: Set branch name as env variable
         run: |
-          echo "BRANCH_NAME=${GITHUB_REF_NAME}" >> $GITHUB_ENV
-          echo ${GITHUB_REF_NAME}
-      - run: echo "${{ env.BRANCH_NAME }}"
+          echo "branch_name=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
+      - run: echo "${{ env.branch_name }}"
       - name: Fire event
         run: |
           curl -L \
@@ -39,4 +38,4 @@ jobs:
           -H "Authorization: Bearer ${{ secrets.REPOSITORY_ACCESS_TOKEN }}" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           https://api.github.com/repos/lloydamt/suggestions-terraform/dispatches \
-          -d '{"event_type":"deploy-de", "client_payload": {"branch_name": "${{ env.BRANCH_NAME }}"}}'
+          -d '{"event_type":"deploy-de", "client_payload": {"branch_name": "${{ env.branch_name }}"}}'
