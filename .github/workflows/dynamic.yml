@@ -32,6 +32,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dist
+          path: dist
       - name: Set branch name as env variable
         run: |
           echo "branch_name=${{ github.head_ref }}" >> $GITHUB_ENV
