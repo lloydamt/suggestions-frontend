@@ -25,7 +25,6 @@ jobs:
           path: dist
       - name: Set branch name as env variable
         run: |
-          ls
           echo "branch_name=${{ github.head_ref }}" >> $GITHUB_ENV
       - name: Fire event
         run: |
