@@ -12,17 +12,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set up node/npm
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-      - run: npm i
-      - run: npm run build
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist
       - name: Set branch name as env variable
         run: |
           echo "branch_name=${{ github.head_ref }}" >> $GITHUB_ENV
